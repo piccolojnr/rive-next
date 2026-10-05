@@ -31,7 +31,7 @@ const DetailPage = () => {
   const [season, setSeason] = useState<string | null>();
   const [episode, setEpisode] = useState<string | null>();
   const [index, setIndex] = useState(0);
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<string[]>([]);
   const [data, setData] = useState<any>({});
   const [bookmarked, setBookmarked] = useState(false);
   const [trailer, setTrailer] = useState<any>("");
@@ -39,28 +39,42 @@ const DetailPage = () => {
   const [user, setUser] = useState<any>();
 
   useEffect(() => {
-    setLoading(true);
-    setType(params?.get("type"));
-    setId(params?.get("id"));
+    const currentType = params?.get("type");
+    const currentId = params?.get("id");
+    setType(currentType);
+    setId(currentId);
     setSeason(params?.get("season"));
     setEpisode(params?.get("episode"));
+
+    if (!currentType || !currentId) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     const fetchData = async () => {
       try {
-        const data = await axiosFetch({ requestID: `${type}Data`, id: id });
+        const data = await axiosFetch({
+          requestID: `${currentType}Data`,
+          id: currentId,
+        });
         setData(data);
-        const Videos = await axiosFetch({ requestID: `${type}Videos`, id: id });
+        const videos = await axiosFetch({
+          requestID: `${currentType}Videos`,
+          id: currentId,
+        });
         setTrailer(
-          Videos?.results?.find(
+          videos?.results?.find(
             (ele: any) => ele.type === "Trailer" && ele.official === true,
           ),
         );
         const response = await axiosFetch({
-          requestID: `${type}Images`,
-          id: id,
+          requestID: `${currentType}Images`,
+          id: currentId,
         });
         // setImages(response.results);
         let arr: any = [];
-        response.backdrops.map((ele: any, i: number) => {
+        (response?.backdrops || []).map((ele: any, i: number) => {
           if (i < 20)
             arr.push(process.env.NEXT_PUBLIC_TMBD_IMAGE_URL + ele.file_path);
         });
@@ -71,9 +85,12 @@ const DetailPage = () => {
         // }
         if (arr.length === 0) arr.push("/images/logo.svg");
         setImages(arr);
-        setLoading(false);
       } catch (error) {
-        // console.error("Error fetching data:", error);
+        console.error("Failed to load detail page:", error);
+        setData({});
+        setImages(["/images/logo.svg"]);
+      } finally {
+        setLoading(false);
       }
       // finally {
       //   const data = await axiosFetch({ requestID: `${type}Data`, id: id });
@@ -81,7 +98,7 @@ const DetailPage = () => {
       // }
     };
     fetchData();
-  }, [params, id]);
+  }, [params]);
 
   useEffect(() => {
     if (!auth) {
