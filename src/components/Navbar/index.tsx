@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import styles from "./style.module.scss";
 import Link from "next/link";
@@ -43,11 +45,11 @@ const Navbar = ({ children }: any) => {
   // const query=
   const [pathname, setPathname] = useState(path);
   useEffect(() => {
-    if (params.get("type") !== null) setPathname("/" + params.get("type"));
+    if (params?.get("type") !== null) setPathname("/" + params?.get("type"));
     // else setPathname(path);
     else {
       const arr = path?.split("/");
-      setPathname("/" + arr[1]);
+      setPathname("/" + arr?.[1]);
     }
     // console.log(path);
   }, [path, params]);

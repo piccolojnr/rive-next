@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import styles from "./style.module.scss";
 import Link from "next/link";

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 // import Spinner from "@/components/Spinner";
 import styles from "./style.module.scss";
@@ -6,7 +8,6 @@ import { motion } from "framer-motion";
 import { getSettings } from "@/Utils/settings";
 import SettingsPage from "../SettingsPage";
 import { usePathname } from "next/navigation";
-import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { fetchRandom } from "@/Utils/randomdata";
 
@@ -57,27 +58,30 @@ const Layout = ({ children }: any) => {
     document.documentElement.style.setProperty("--ascent-color", ascent_color);
     document.documentElement.style.setProperty("--mode", mode);
   }, [mode, ascent_color]);
+  useEffect(() => {
+    // next/head is not supported in the App Router; update theme-color
+    // meta tags directly so the address bar still follows the mode.
+    const content =
+      mode === "dark"
+        ? "#1b1919"
+        : mode === "light"
+          ? "#f4f7fe"
+          : (themeColor ?? "#f4f7fe");
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    themeMeta?.setAttribute("content", content);
+    let tileMeta = document.querySelector(
+      'meta[name="msapplication-TileColor"]',
+    );
+    if (!tileMeta) {
+      tileMeta = document.createElement("meta");
+      tileMeta.setAttribute("name", "msapplication-TileColor");
+      document.head.appendChild(tileMeta);
+    }
+    tileMeta.setAttribute("content", content);
+  }, [mode, themeColor]);
   const path = usePathname();
   return (
     <>
-      {mode === "dark" && (
-        <Head>
-          <meta name="theme-color" content="#1b1919" />
-          <meta name="msapplication-TileColor" content="#1b1919" />
-        </Head>
-      )}
-      {mode === "light" && (
-        <Head>
-          <meta name="theme-color" content="#f4f7fe" />
-          <meta name="msapplication-TileColor" content="#f4f7fe" />
-        </Head>
-      )}
-      {mode === "system" && (
-        <Head>
-          <meta name="theme-color" content={`${themeColor}`} />
-          <meta name="msapplication-TileColor" content={`${themeColor}`} />
-        </Head>
-      )}
       <div
         className={`${styles.background} ${mode === "dark" && "dark"} ${mode === "light" && "light"}`}
       >

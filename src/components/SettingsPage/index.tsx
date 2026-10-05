@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import styles from "@/styles/Settings.module.scss";
 import Link from "next/link";

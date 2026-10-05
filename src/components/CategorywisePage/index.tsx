@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import axiosFetch from "@/Utils/fetchBackend";
 import styles from "./style.module.scss";
