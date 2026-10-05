@@ -23,6 +23,11 @@ const SettingsPage = ({
   const { push } = useRouter();
 
   useEffect(() => {
+    if (!auth) {
+      setUser(false);
+      setLoading(false);
+      return;
+    }
     onAuthStateChanged(auth, (user) => {
       // console.log({ user });
       if (user) {

@@ -21,7 +21,16 @@ import {
 } from "firebase/firestore";
 import { toast } from "sonner";
 
+const requireCloud = () => {
+  if (!auth || !db) {
+    toast.error("Cloud login not configured - using local watchlist");
+    return false;
+  }
+  return true;
+};
+
 export const signupUserManual = async ({ username, email, password }: any) => {
+  if (!requireCloud()) return false;
   const isEmailCorrect = /\S+@\S+\.\S+/.test(email);
   if (!username || !email || !password) {
     // toast.dismiss(loadingToast);
@@ -64,6 +73,7 @@ export const signupUserManual = async ({ username, email, password }: any) => {
 };
 
 export const loginUserManual = async ({ email, password }: any) => {
+  if (!requireCloud()) return false;
   const isEmailCorrect = /\S+@\S+\.\S+/.test(email);
 
   const loadingToast = toast.loading("Connecting to cloud provider...");
@@ -104,6 +114,7 @@ export const loginUserManual = async ({ email, password }: any) => {
   }
 };
 export const loginUserGoogle = async () => {
+  if (!requireCloud()) return false;
   const loadingToast = toast.loading("Connecting to cloud provider...");
   try {
     const result = await signInWithPopup(auth, provider);
@@ -121,6 +132,7 @@ export const loginUserGoogle = async () => {
 };
 
 export const logoutUser = () => {
+  if (!requireCloud()) return;
   const loadingToast = toast.loading("Connecting to cloud provider...");
   signOut(auth)
     .then(() => {
@@ -152,6 +164,7 @@ export const logoutUser = () => {
 // };
 
 export const fetchFbWatchlist = async ({ userID = null }: any) => {
+  if (!db) return { movie: [], tv: [] };
   const loadingToast = toast.loading("Connecting to cloud provider...");
   const userWatchlist: any = { movie: [], tv: [] };
   try {
@@ -178,6 +191,7 @@ export const removeFromFbWatchlist = async ({
   type,
   id,
 }: any) => {
+  if (!db) return;
   const loadingToast = toast.loading("Connecting to cloud provider...");
   try {
     const q = query(collection(db, "watchlist"), where("userID", "==", userID));
@@ -201,6 +215,7 @@ export const removeFromFbWatchlist = async ({
   }
 };
 export const checkInFbWatchlist = async ({ userID = null, type, id }: any) => {
+  if (!db) return false;
   try {
     const q = query(collection(db, "watchlist"), where("userID", "==", userID));
     const querySnapshot = await getDocs(q);
@@ -218,6 +233,7 @@ export const checkInFbWatchlist = async ({ userID = null, type, id }: any) => {
   return false;
 };
 export const addToFbWatchlist = async ({ userID = null, type, id }: any) => {
+  if (!db) return;
   if (userID === null) {
     // toast.dismiss(loadingToast);
     toast.error("Error updating watchlist");

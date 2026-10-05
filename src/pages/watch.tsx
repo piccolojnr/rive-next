@@ -24,7 +24,7 @@ const Watch = () => {
   const [loading, setLoading] = useState(true);
   const [watchDetails, setWatchDetails] = useState(false);
   const [data, setdata] = useState<any>();
-  const [source, setSource] = useState("SUP");
+  const [source, setSource] = useState("VIDLINK");
   const nextBtn: any = useRef(null);
   const backBtn: any = useRef(null);
   const moreBtn: any = useRef(null);
@@ -95,46 +95,12 @@ const Watch = () => {
     };
   }, [params, id, season, episode]);
   useEffect(() => {
-    toast.info(
-      <div>
-        Cloud: use AD-Blocker services for AD-free experience, like AD-Blocker
-        extension or{" "}
-        <a target="_blank" href="https://brave.com/">
-          Brave Browser{" "}
-        </a>
-      </div>,
-    );
-
-    toast.info(
-      <div>
-        Cloud: use video downloader extensions like{" "}
-        <a target="_blank" href="https://fetchv.net/">
-          FetchV{" "}
-        </a>{" "}
-        or{" "}
-        <a target="_blank" href="https://www.hlsloader.com/">
-          Stream Recorder{" "}
-        </a>{" "}
-        for PC and{" "}
-        <a
-          target="_blank"
-          href="https://play.google.com/store/apps/details?id=videoplayer.videodownloader.downloader"
-        >
-          AVDP{" "}
-        </a>{" "}
-        for Android, to download movies/tv shows. Refer{" "}
-        <a
-          target="_blank"
-          href="https://www.reddit.com/r/DataHoarder/comments/qgne3i/how_to_download_videos_from_vidsrcme/"
-        >
-          The Source{" "}
-        </a>
-      </div>,
-    );
-    // window.addEventListener("keydown", (event) => {
-    //   console.log("Key pressed:", event.key);
-    // });
-  }, []);
+    // Personal build: VidLink / VidFast are ad-free, no blocker needed.
+    // Fallback sources may show ads.
+    if (source !== "VIDLINK" && source !== "VIDFAST") {
+      toast.info("Fallback source: use an ad-blocker if you see popups.");
+    }
+  }, [source]);
   // useEffect(() => {
   //   setTimeout(() => {
   //     console.log({ id });
@@ -169,12 +135,59 @@ const Watch = () => {
       );
   }
 
-  const STREAM_URL_AGG = process.env.NEXT_PUBLIC_STREAM_URL_AGG;
-  const STREAM_URL_VID = process.env.NEXT_PUBLIC_STREAM_URL_VID;
-  const STREAM_URL_PRO = process.env.NEXT_PUBLIC_STREAM_URL_PRO;
-  const STREAM_URL_EMB = process.env.NEXT_PUBLIC_STREAM_URL_EMB;
-  const STREAM_URL_MULTI = process.env.NEXT_PUBLIC_STREAM_URL_MULTI;
-  const STREAM_URL_SUP = process.env.NEXT_PUBLIC_STREAM_URL_SUP;
+  // Personal ad-free setup: hardcoded providers, env overrides allowed.
+  // VidLink + VidFast are ad-free / no popups. Others are fallbacks.
+  const STREAM_URL_VIDLINK =
+    process.env.NEXT_PUBLIC_STREAM_URL_VIDLINK || "https://vidlink.pro";
+  const STREAM_URL_VIDFAST =
+    process.env.NEXT_PUBLIC_STREAM_URL_VIDFAST || "https://vidfast.pro";
+  const STREAM_URL_EMBEDSU =
+    process.env.NEXT_PUBLIC_STREAM_URL_EMB || "https://embed.su";
+  const STREAM_URL_VIDSRC =
+    process.env.NEXT_PUBLIC_STREAM_URL_VID || "https://vidsrc.cc/v2";
+  const STREAM_URL_MULTI =
+    process.env.NEXT_PUBLIC_STREAM_URL_MULTI || "https://multiembed.mov";
+  const STREAM_URL_2EMBED =
+    process.env.NEXT_PUBLIC_STREAM_URL_AGG || "https://www.2embed.stream";
+
+  const getSrc = () => {
+    if (!id) return "";
+    if (type === "movie") {
+      switch (source) {
+        case "VIDLINK":
+          return `${STREAM_URL_VIDLINK}/movie/${id}`;
+        case "VIDFAST":
+          return `${STREAM_URL_VIDFAST}/movie/${id}?autoPlay=true`;
+        case "EMBEDSU":
+          return `${STREAM_URL_EMBEDSU}/embed/movie/${id}`;
+        case "VIDSRC":
+          return `${STREAM_URL_VIDSRC}/embed/movie/${id}`;
+        case "MULTI":
+          return `${STREAM_URL_MULTI}/?video_id=${id}&tmdb=1`;
+        case "TWOEMBED":
+          return `${STREAM_URL_2EMBED}/embed/movie/${id}`;
+        default:
+          return `${STREAM_URL_VIDLINK}/movie/${id}`;
+      }
+    } else {
+      switch (source) {
+        case "VIDLINK":
+          return `${STREAM_URL_VIDLINK}/tv/${id}/${season}/${episode}`;
+        case "VIDFAST":
+          return `${STREAM_URL_VIDFAST}/tv/${id}/${season}/${episode}?autoPlay=true&autoNext=true`;
+        case "EMBEDSU":
+          return `${STREAM_URL_EMBEDSU}/embed/tv/${id}/${season}/${episode}`;
+        case "VIDSRC":
+          return `${STREAM_URL_VIDSRC}/embed/tv/${id}/${season}/${episode}`;
+        case "MULTI":
+          return `${STREAM_URL_MULTI}/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`;
+        case "TWOEMBED":
+          return `${STREAM_URL_2EMBED}/embed/tv/${id}/${season}/${episode}`;
+        default:
+          return `${STREAM_URL_VIDLINK}/tv/${id}/${season}/${episode}`;
+      }
+    }
+  };
 
   return (
     <div className={styles.watch}>
@@ -259,90 +272,20 @@ const Watch = () => {
         value={source}
         onChange={(e) => setSource(e.target.value)}
       >
-        <option value="AGG">Aggregator : 1 (Multi-Server)</option>
-        <option value="VID">Aggregator : 2 (Best-Server)</option>
-        <option value="PRO">Aggregator : 3 (HQ-Server)</option>
-        <option value="EMB">Aggregator : 4</option>
-        <option value="MULTI">Aggregator : 5 (Fast-Server)</option>
-        <option value="SUP" defaultChecked>
-          Aggregator : 6 (Multi/Most-Server)
-        </option>
+        <option value="VIDLINK">VidLink (Ad-free, Recommended)</option>
+        <option value="VIDFAST">VidFast (Ad-free, Auto-Next)</option>
+        <option value="EMBEDSU">Embed.su (Fallback)</option>
+        <option value="VIDSRC">VidSrc.cc (Fallback)</option>
+        <option value="MULTI">MultiEmbed (Fallback)</option>
+        <option value="TWOEMBED">2Embed (Fallback)</option>
       </select>
       <div className={`${styles.loader} skeleton`}></div>
 
-      {source === "AGG" && id !== "" && id !== null ? (
+      {id !== "" && id != null ? (
         <iframe
+          key={source + id + season + episode}
           scrolling="no"
-          src={
-            type === "movie"
-              ? `${STREAM_URL_AGG}/embed/${id}`
-              : `${STREAM_URL_AGG}/embed/${id}/${season}/${episode}`
-          }
-          className={styles.iframe}
-          allowFullScreen
-        ></iframe>
-      ) : null}
-
-      {source === "VID" && id !== "" && id !== null ? (
-        <iframe
-          scrolling="no"
-          src={
-            type === "movie"
-              ? `${STREAM_URL_VID}/embed/${type}/${id}`
-              : `${STREAM_URL_VID}/embed/${type}/${id}/${season}/${episode}`
-          }
-          className={styles.iframe}
-          allowFullScreen
-        ></iframe>
-      ) : null}
-
-      {source === "PRO" && id !== "" && id !== null ? (
-        <iframe
-          scrolling="no"
-          src={
-            type === "movie"
-              ? `${STREAM_URL_PRO}/embed/${type}/${id}`
-              : `${STREAM_URL_PRO}/embed/${type}/${id}/${season}/${episode}`
-          }
-          className={styles.iframe}
-          allowFullScreen
-        ></iframe>
-      ) : null}
-
-      {source === "EMB" && id !== "" && id !== null ? (
-        <iframe
-          scrolling="no"
-          src={
-            type === "movie"
-              ? `${STREAM_URL_EMB}/embed/${type}/${id}`
-              : `${STREAM_URL_EMB}/embed/${type}/${id}/${season}/${episode}`
-          }
-          className={styles.iframe}
-          allowFullScreen
-        ></iframe>
-      ) : null}
-
-      {source === "MULTI" && id !== "" && id !== null ? (
-        <iframe
-          scrolling="no"
-          src={
-            type === "movie"
-              ? `${STREAM_URL_MULTI}?video_id=${id}&tmdb=1`
-              : `${STREAM_URL_MULTI}?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
-          }
-          className={styles.iframe}
-          allowFullScreen
-        ></iframe>
-      ) : null}
-
-      {source === "SUP" && id !== "" && id !== null ? (
-        <iframe
-          scrolling="no"
-          src={
-            type === "movie"
-              ? `${STREAM_URL_SUP}/?video_id=${id}&tmdb=1`
-              : `${STREAM_URL_SUP}/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
-          }
+          src={getSrc()}
           className={styles.iframe}
           allowFullScreen
         ></iframe>

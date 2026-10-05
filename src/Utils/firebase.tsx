@@ -7,8 +7,7 @@ import { GoogleAuthProvider } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Personal build: Firebase is optional. Local watchlist works without it.
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FB_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FB_AUTH_DOMAIN,
@@ -19,9 +18,11 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FB_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
-// export const analytics = getAnalytics(app);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const provider = new GoogleAuthProvider();
+const hasFirebase = Boolean(firebaseConfig.apiKey);
+
+// Initialize Firebase only if keys provided, else export nulls
+// so `pnpm build` / dev works with local-only mode.
+export const app: any = hasFirebase ? initializeApp(firebaseConfig) : null;
+export const auth: any = hasFirebase ? getAuth(app) : null;
+export const db: any = hasFirebase ? getFirestore(app) : null;
+export const provider: any = hasFirebase ? new GoogleAuthProvider() : null;
