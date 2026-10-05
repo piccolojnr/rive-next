@@ -138,14 +138,18 @@ const Watch = () => {
 
   // Personal ad-free setup: hardcoded providers, env overrides allowed.
   // VidLink + VidFast are ad-free / no popups. Others are fallbacks.
+  // Verified Oct 2026: vidfast.pro moved to vidfast.vc; embed.su is DNS-dead
+  // (replaced by vidsrc.su); vidsrc.cc returns 522 (replaced by vidsrc.tw).
   const STREAM_URL_VIDLINK =
     process.env.NEXT_PUBLIC_STREAM_URL_VIDLINK || "https://vidlink.pro";
   const STREAM_URL_VIDFAST =
-    process.env.NEXT_PUBLIC_STREAM_URL_VIDFAST || "https://vidfast.pro";
-  const STREAM_URL_EMBEDSU =
-    process.env.NEXT_PUBLIC_STREAM_URL_EMB || "https://embed.su";
-  const STREAM_URL_VIDSRC =
-    process.env.NEXT_PUBLIC_STREAM_URL_VID || "https://vidsrc.cc/v2";
+    process.env.NEXT_PUBLIC_STREAM_URL_VIDFAST || "https://vidfast.vc";
+  const STREAM_URL_VIDSRC_SU =
+    process.env.NEXT_PUBLIC_STREAM_URL_EMB || "https://vidsrc.su";
+  const STREAM_URL_VIDSRC_TW =
+    process.env.NEXT_PUBLIC_STREAM_URL_VID || "https://vidsrc.tw";
+  const STREAM_URL_VIDEASY =
+    process.env.NEXT_PUBLIC_STREAM_URL_VIDEASY || "https://player.videasy.net";
   const STREAM_URL_MULTI =
     process.env.NEXT_PUBLIC_STREAM_URL_MULTI || "https://multiembed.mov";
   const STREAM_URL_2EMBED =
@@ -159,10 +163,12 @@ const Watch = () => {
           return `${STREAM_URL_VIDLINK}/movie/${id}`;
         case "VIDFAST":
           return `${STREAM_URL_VIDFAST}/movie/${id}?autoPlay=true`;
-        case "EMBEDSU":
-          return `${STREAM_URL_EMBEDSU}/embed/movie/${id}`;
-        case "VIDSRC":
-          return `${STREAM_URL_VIDSRC}/embed/movie/${id}`;
+        case "VIDSRCTW":
+          return `${STREAM_URL_VIDSRC_TW}/embed/movie/${id}`;
+        case "VIDSRCSU":
+          return `${STREAM_URL_VIDSRC_SU}/embed/movie/${id}`;
+        case "VIDEASY":
+          return `${STREAM_URL_VIDEASY}/movie/${id}`;
         case "MULTI":
           return `${STREAM_URL_MULTI}/?video_id=${id}&tmdb=1`;
         case "TWOEMBED":
@@ -176,10 +182,12 @@ const Watch = () => {
           return `${STREAM_URL_VIDLINK}/tv/${id}/${season}/${episode}`;
         case "VIDFAST":
           return `${STREAM_URL_VIDFAST}/tv/${id}/${season}/${episode}?autoPlay=true&autoNext=true`;
-        case "EMBEDSU":
-          return `${STREAM_URL_EMBEDSU}/embed/tv/${id}/${season}/${episode}`;
-        case "VIDSRC":
-          return `${STREAM_URL_VIDSRC}/embed/tv/${id}/${season}/${episode}`;
+        case "VIDSRCTW":
+          return `${STREAM_URL_VIDSRC_TW}/embed/tv/${id}/${season}/${episode}`;
+        case "VIDSRCSU":
+          return `${STREAM_URL_VIDSRC_SU}/embed/tv/${id}/${season}/${episode}`;
+        case "VIDEASY":
+          return `${STREAM_URL_VIDEASY}/tv/${id}/${season}/${episode}`;
         case "MULTI":
           return `${STREAM_URL_MULTI}/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`;
         case "TWOEMBED":
@@ -275,8 +283,9 @@ const Watch = () => {
       >
         <option value="VIDLINK">VidLink (Ad-free, Recommended)</option>
         <option value="VIDFAST">VidFast (Ad-free, Auto-Next)</option>
-        <option value="EMBEDSU">Embed.su (Fallback)</option>
-        <option value="VIDSRC">VidSrc.cc (Fallback)</option>
+        <option value="VIDSRCTW">VidSrc TW (Fallback)</option>
+        <option value="VIDSRCSU">VidSrc SU (Fallback)</option>
+        <option value="VIDEASY">VidEasy (Fallback)</option>
         <option value="MULTI">MultiEmbed (Fallback)</option>
         <option value="TWOEMBED">2Embed (Fallback)</option>
       </select>
