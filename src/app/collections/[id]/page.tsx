@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import axiosFetch from "@/Utils/fetchBackend";
 // import styles from "@/components/CategorywisePage/style.module.scss";
 import styles from "@/styles/Search.module.scss";
@@ -9,15 +9,16 @@ import NProgress from "nprogress";
 // import MoviePoster from '@/components/MoviePoster';
 
 const dummyList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const Collections = ({ params }: { params: { id: string } }) => {
-  const [id, setid] = useState<any>(params.id);
+const Collections = ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id: paramId } = use(params);
+  const [id, setid] = useState<any>(paramId);
   const [data, setData] = useState<any>([]);
   const [trigger, setTrigger] = useState(false);
   const [loading, setLoading] = useState(true);
-  console.log({ id: params.id });
+  console.log({ id: paramId });
   useEffect(() => {
-    setid(params.id);
-  }, [params.id]);
+    setid(paramId);
+  }, [paramId]);
   useEffect(() => {
     if (loading) {
       NProgress.start();

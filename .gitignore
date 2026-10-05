@@ -5,8 +5,6 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
-/pnpm-lock.yaml
-/package-lock.yaml
 
 # testing
 /coverage
@@ -14,6 +12,13 @@
 # next.js
 /.next/
 /out/
+
+# next-pwa generated files (regenerated on every build)
+/public/sw.js
+/public/sw.js.map
+/public/workbox-*.js
+/public/workbox-*.js.map
+/public/fallback-*.js
 
 # production
 /build
